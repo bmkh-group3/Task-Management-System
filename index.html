@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Task Management System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    .task-form {
+      margin-bottom: 20px;
+    }
+    .task-form input, .task-form select, .task-form button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+    }
+    .task-list {
+      margin-top: 20px;
+    }
+    .task {
+      padding: 10px;
+      background: #fff;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .task.completed {
+      background: #d4edda;
+      text-decoration: line-through;
+    }
+    .task-actions button {
+      margin-left: 5px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Task Management System</h1>
+  
+  <!-- Form to Add Tasks -->
+  <div class="task-form">
+    <input type="text" id="title" placeholder="Task Title" required>
+    <input type="text" id="description" placeholder="Task Description" required>
+    <select id="priority">
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <input type="date" id="dueDate" required>
+    <button onclick="addTask()">Add Task</button>
+  </div>
+  
+  <!-- Filter by Priority -->
+  <div class="task-form">
+    <select id="filterPriority" onchange="filterTasks()">
+      <option value="">Filter by Priority</option>
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+  </div>
+  
+  <!-- Task List -->
+  <div class="task-list" id="taskList"></div>
+  
+  <script>
+    let tasks = [];
+
+    // Add Task
+    function addTask() {
+      const title = document.getElementById('title').value;
+      const description = document.getElementById('description').value;
+      const priority = document.getElementById('priority').value;
+      const dueDate = document.getElementById('dueDate').value;
+
+      if (title && description && priority && dueDate) {
+        const task = {
+          title,
+          description,
+          priority,
+          dueDate,
+          isComplete: false
+        };
+        tasks.push(task);
+        document.getElementById('title').value = '';
+        document.getElementById('description').value = '';
+        document.getElementById('priority').value = 'High';
+        document.getElementById('dueDate').value = '';
+        renderTasks();
+      } else {
+        alert('Please fill in all fields.');
+      }
+    }
+
+    // Render Tasks
+    function renderTasks() {
+      const taskList = document.getElementById('taskList');
+      taskList.innerHTML = '';
+      tasks.forEach((task, index) => {
+        const taskDiv = document.createElement('div');
+        taskDiv.className = `task ${task.isComplete ? 'completed' : ''}`;
+        taskDiv.innerHTML = `
+          <div>
+            <strong>${task.title}</strong><br>
+            ${task.description}<br>
+            <em>Priority:</em> ${task.priority}, <em>Due:</em> ${task.dueDate}
+          </div>
+          <div class="task-actions">
+            <button onclick="markTaskComplete(${index})">Complete</button>
+            <button onclick="editTask(${index})">Edit</button>
+            <button onclick="deleteTask(${index})">Delete</button>
+          </div>
+        `;
+        taskList.appendChild(taskDiv);
+      });
+    }
+
+    // Mark Task as Complete
+    function markTaskComplete(index) {
+      tasks[index].isComplete = true;
+      renderTasks();
+    }
+
+    // Edit Task
+    function editTask(index) {
+      const newTitle = prompt('Edit Title:', tasks[index].title);
+      const newDescription = prompt('Edit Description:', tasks[index].description);
+      const newPriority = prompt('Edit Priority (High/Medium/Low):', tasks[index].priority);
+      const newDueDate = prompt('Edit Due Date:', tasks[index].dueDate);
+
+      if (newTitle && newDescription && newPriority && newDueDate) {
+        tasks[index].title = newTitle;
+        tasks[index].description = newDescription;
+        tasks[index].priority = newPriority;
+        tasks[index].dueDate = newDueDate;
+        renderTasks();
+      } else {
+        alert('All fields are required to edit a task.');
+      }
+    }
+
+    // Delete Task
+    function deleteTask(index) {
+      tasks.splice(index, 1);
+      renderTasks();
+    }
+
+    // Filter Tasks by Priority
+    function filterTasks() {
+      const filterPriority = document.getElementById('filterPriority').value;
+      if (filterPriority) {
+        const filteredTasks = tasks.filter(task => task.priority === filterPriority);
+        tasks = filteredTasks;
+      }
+      renderTasks();
+    }
+  </script>
+</body>
+</html>
